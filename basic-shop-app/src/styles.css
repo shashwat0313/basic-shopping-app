@@ -1,0 +1,96 @@
+*, *::after, *::before{
+    box-sizing: border-box;
+}
+
+body{
+    user-select: none;
+}
+
+.sort-image{
+    height: 1rem;
+    width: 1rem;
+}
+
+.box{
+    text-align: center;
+    border-width: 3px;
+    border-style: solid;
+    width: 45%;
+    position: relative;
+    transform: translate(-50%);
+    left:50%;
+    top:3rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   
+}
+
+/* .heading{
+} */
+
+
+.list{
+    font-size: 1.4rem;
+    text-align: left;
+    list-style-type: none;
+    list-style-position: outside;
+    padding-left: 5%;
+
+}
+
+.topRow{
+    font-weight: 600;
+}
+
+.name-col{
+    display: inline-block;
+    width: 56%;
+}
+
+.price-col{
+    display: inline-block;
+    width: 20%;
+    text-align: right;
+}
+
+.qty-col{
+    display: inline-block;
+    width: 15%;
+    text-align: right;
+}
+
+.search-box{
+    position: relative;
+    box-sizing: content-box;
+    border-style: solid;
+    border-width: 0.1px;
+    border-color:gray;
+    border-radius: 5px;
+    width: 90%;
+    transform: translate(-50%);
+    left:50%;
+    height: 2rem;
+    font-size: x-small;
+    text-align: center;
+    padding-left: 5px;
+}
+
+.search-form{
+    position: relative;
+    /* display: inline; */
+    transform: translateY(-50%);
+    top:50%;
+    /* padding-left: 100px; */
+}
+
+.search-submit-btn{
+    position: relative;
+    margin-left: 30%;
+    /* right: 0; */
+}
+
+@media (max-width:700px) {
+    .box{
+        width: 95%;
+        min-width: 400px;
+    }
+}

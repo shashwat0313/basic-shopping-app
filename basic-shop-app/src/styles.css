@@ -24,9 +24,12 @@ body{
    
 }
 
-/* .heading{
-} */
-
+.loginform{
+    transform: translate(-50%, -50%);
+    position: relative;
+    top: 5rem;
+    left: 50%;
+}
 
 .list{
     font-size: 1.4rem;
@@ -72,6 +75,15 @@ body{
     font-size: x-small;
     text-align: center;
     padding-left: 5px;
+}
+
+.sign-in{
+    position: relative;
+    transform: translateY(-50%);
+    /* display: inline-block; */
+    /* left: 00%; */
+    /* word-wrap: normal; */
+    /* right:5% */
 }
 
 .search-form{

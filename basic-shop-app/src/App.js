@@ -1,20 +1,25 @@
 // eslint-disable-next-line
-
 import "./styles.css";
 import React, { useState, useEffect } from "react";
 import Heading from "./components/Heading";
 import List from "./components/List";
-import Search from "./components/Search"
+import Search from "./components/Search";
 import Cart from "./components/Cart";
+// import Signin from "./components/Signin";
 import {
   Route,
   Routes,
+  useFetcher,
 } from "react-router-dom";
+import Signin from "./components/Signin";
+import jwt from 'jwt-decode'
 
 let HEADING = "";
 let ITEMS = []
+const clientID = "1041261791254-mbtvjmn3kep32isbfr7mn6v2fp99ibu8.apps.googleusercontent.com"
 
-function App() {
+
+export default function App() {
   useEffect(() => {
     fetch("/api/assets").then(
       (res) => {
@@ -38,6 +43,8 @@ function App() {
   const [priceSortedState, setSortedState] = useState("price-unsorted")
   const [QtySortedState, setQtySortedState] = useState("Qty-unsorted")
   const [cart, setCart] = useState([])
+  const [isSignedin, setSignin] = useState(false);
+  const [mailid, setid] = useState("")
 
   function addToCart(e) {
     const name = e.target.value;
@@ -97,13 +104,16 @@ function App() {
     setQtySortedState("Qty-unsorted")
   }
 
-
   return (
     <Routes>
+
       <Route path="/" element={
         <div className="box">
           <Heading heading={HEADING} />
           <Search SearchHandler={SearchHandler} />
+
+          {/* {isSignedin ? <div>{mailid}</div> : <div>Not signed in</div>} */}
+
           <List addToCart={addToCart}
             itemArray={currentList}
             sortByPrice={sortByPrice}
@@ -111,9 +121,9 @@ function App() {
           />
         </div>
       } />
+
+      <Route path="/signin" element={<Signin />} />
       <Route path="/cart" element={<Cart cartItems={cart} />} />
     </Routes>
   );
 }
-
-export default App;

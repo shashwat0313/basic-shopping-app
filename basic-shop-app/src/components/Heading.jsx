@@ -11,6 +11,10 @@ function Heading({ heading }) {
                     <h3 style={{ display: 'inline-block', marginLeft: '20px' }}>Cart</h3>
                 </Link>
                 
+                <Link to={'/signin'}>
+                    <h3 style={{ display: 'inline-block', marginLeft: '20px' }}>Log in</h3>
+                </Link>
+
             </span>
         </div>
     )

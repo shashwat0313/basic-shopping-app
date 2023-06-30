@@ -1,13 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Basic Shopping App</title>
-    <script src="../src/index.js" type="text/JSX" defer></script>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-  </body>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Basic Shopping App</title>
+  <script src="../src/index.js" type="text/JSX" defer></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+</body>
+
 </html>
+
+<!-- <script>
+  const clientID = "1041261791254-mbtvjmn3kep32isbfr7mn6v2fp99ibu8.apps.googleusercontent.com"
+  const scopes = ['www.googleapis.com/auth/userinfo.email', 'www.googleapis.com/auth/userinfo.profile']
+  const code_receiver_uri = "http://localhost:3000/auth"
+
+  const client = google.accounts.oauth2.initCodeClient({
+    client_id: clientID,
+    scope: 'https://www.googleapis.com/auth/userinfo.email',
+    ux_mode: 'popup'
+    // ,
+    // callback: (response) => {
+    //     console.log(response);
+    //   const xhr = new XMLHttpRequest();
+    //   xhr.open('POST', code_receiver_uri, true);
+    //   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    //   // Set custom header for CRSF
+    //   xhr.setRequestHeader('X-Requested-With', 'XmlHttpRequest');
+    //   xhr.onload = function() {
+    //     alert('Auth code response: ' + xhr.responseText);
+    //   };
+    //   xhr.send('code=' + response.code);
+    // },
+  });
+</script> -->

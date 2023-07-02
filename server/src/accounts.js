@@ -8,6 +8,7 @@ const localStrategy = require('passport-local').Strategy
 const session = require('express-session')
 const mongostore = require('connect-mongo')
 const GoogleOneTapStrategy = require("passport-google-one-tap").GoogleOneTapStrategy;
+const customStrategy = require('passport-custom').Strategy
 const { OAuth2Client } = require('google-auth-library');
 const jwt = require('jsonwebtoken');
 const clientID = "1041261791254-mbtvjmn3kep32isbfr7mn6v2fp99ibu8.apps.googleusercontent.com"
@@ -16,10 +17,6 @@ const client = new OAuth2Client(clientID);
 const scopes = ['www.googleapis.com/auth/userinfo.email', 'www.googleapis.com/auth/userinfo.profile']
 const bodyParser = require('body-parser')
 router.use(bodyParser.urlencoded({ extended: true }));
-// const json = bodyParser.json()
-// router.use(json)
-// router.use(json)
-
 const MongooseConnection = mongoose.createConnection("mongodb://127.0.0.1:27017/shop")
 
 const userSchema = new mongoose.Schema(
@@ -47,12 +44,15 @@ router.use(session({
 }))
 
 passport.serializeUser(function (user, cb) {
-    // console.log('inside seriealize...user' + JSON.stringify(user.doc.id));
+    console.log('inside seriealize...user' + JSON.stringify(user));
+
+    console.log("user type: "+typeof user);
+
     cb(null, user.doc.id);
 });
 
 passport.deserializeUser(function (id, cb) {
-    console.log('inside deserialize');
+    console.log('inside deserialize...id: ' + id );
     User.findById(id).then((user) => {
         if (user) {
             return cb(null, user)
@@ -71,8 +71,8 @@ passport.use(
             verifyCsrfToken: false, // whether to validate the csrf token or not
         },
         function (profile, done) {
-            console.log("profile received is: " + JSON.stringify(profile));
-            console.log('name is: ' + JSON.stringify(profile.name));
+            // console.log("profile received is: " + JSON.stringify(profile));
+            // console.log('name is: ' + JSON.stringify(profile.name));
             if (!profile) { return done(null) }
             User.findOrCreate({
                 email: (profile.emails[0].value),
@@ -87,12 +87,67 @@ passport.use(
     )
 );
 
+passport.use('custom', new customStrategy(
+    (req, done)=>{
+        const userDetails = (jwt.decode(req.body.credential))
+
+        User.findOrCreate({
+            email: userDetails.email,
+            Name: userDetails.give_name + " " + userDetails.family_name
+        }).then((user) => {
+            console.log("user found:" + JSON.stringify(user));
+            return done(err, user);
+        }).catch((err) => {
+            return done(err)
+        });
+
+        // console.log("this is custom strategy speaking\n...\n"+userDetails.email + "\n" + userDetails.given_name + "\n" + userDetails.family_name);
+        // console.log(`);
+        return done(false);
+    }
+))
+
 router.post('/login', (req, res, next) => {
-    console.log((req.body));
+    // console.log((req.body));
     passport.authenticate('google-one-tap', {
         failureRedirect: 'http://localhost:3000/signin',
         successRedirect: 'http://localhost:3000/'
     })(req, res, next)
+})
+
+router.post('/googleonetap', (req, res, next)=>{
+    
+    passport.authenticate('custom', (err, user, info)=>{
+            if(user){
+                req.logIn(user, (err)=>{
+                    if(err) {return next(err)}
+                    else{
+                        return res.send('/')
+                    }
+                })
+            }
+        // }
+    })(req, res, next)
+
+    // passport.authenticate('custom', {
+    //     // failureFlash:'fault'
+    //     // failureMessage:'fault'
+    //     // failureRedirect:'http://localhost:3000/',
+    //     // successRedirect:'h'
+    //     failWithError:true
+    // }), 
+    // (req, res, next)=>{
+    //     console.log('inside function after authenticate...req: ' + req.body);
+    //     // console.log('req1');
+    // },
+    // (err, req, res, next)=>{
+    //     console.log('err: ' + err + "\nreqbody: " + req.body);
+    // }
+    
+    // console.log(req);
+    // console.log(jwt.decode(req.body.credential));
+    // console.log("post request body:\n...\n" + req.body);
+    // res.send('/')
 })
 
 var loginState = {}
@@ -112,7 +167,7 @@ router.get('/querylogin', (req, res) => {
             email: ""
         })
     }
-    console.log("user found is :\n" + req.user);
+    // console.log("user found is :\n" + req.user);
 
 })
 

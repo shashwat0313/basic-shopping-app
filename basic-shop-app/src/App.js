@@ -9,14 +9,15 @@ import Cart from "./components/Cart";
 import {
   Route,
   Routes,
-  useFetcher,
+  // useFetcher,
 } from "react-router-dom";
 import Signin from "./components/Signin";
-import jwt from 'jwt-decode'
+// import jwt from 'jwt-decode'
+// import Register from "./components/Register";
 
 let HEADING = "";
 let ITEMS = []
-const clientID = "1041261791254-mbtvjmn3kep32isbfr7mn6v2fp99ibu8.apps.googleusercontent.com"
+// const clientID = "1041261791254-mbtvjmn3kep32isbfr7mn6v2fp99ibu8.apps.googleusercontent.com"
 
 
 export default function App() {
@@ -34,8 +35,24 @@ export default function App() {
             })
           }
         )
+      } 
+    )
+  
+    fetch("/accounts/querylogin").then(
+      (res)=>{
+        console.log('res from querylogin: ' + res);
+        res.json().then(
+          (result=>{
+            console.log('result of querylogin :' + JSON.stringify(result));
+            setSignin(result.isLoggedIn)
+            if(result.isLoggedIn){
+              setid(result.email)
+            }
+          })
+        )
       }
     )
+
   }, [])
 
 
@@ -112,7 +129,7 @@ export default function App() {
           <Heading heading={HEADING} />
           <Search SearchHandler={SearchHandler} />
 
-          {/* {isSignedin ? <div>{mailid}</div> : <div>Not signed in</div>} */}
+          {isSignedin ? <div>{mailid}</div> : <div>Not signed in</div>}
 
           <List addToCart={addToCart}
             itemArray={currentList}
@@ -123,6 +140,7 @@ export default function App() {
       } />
 
       <Route path="/signin" element={<Signin />} />
+      {/* <Route path="/register" element={<Register />} /> */}
       <Route path="/cart" element={<Cart cartItems={cart} />} />
     </Routes>
   );

@@ -1,46 +1,58 @@
-import { useState } from "react"
+import {
+    // useState, 
+    useEffect
+} from "react"
+// import jwt from 'jwt-decode'
+const clientID = "1041261791254-mbtvjmn3kep32isbfr7mn6v2fp99ibu8.apps.googleusercontent.com"
+
+const code_receiver_uri = "http://localhost:3000/accounts/login"
+
+// Authorized redirect URIs
+// For use with requests from a web server
+// URIs 1 
+// http://localhost:1337/api/sessions/oauth/google
+// URIs 2 
+// http://localhost:3000/login
+// URIs 3 
+// http://localhost
+// URIs 4 
+// http://localhost:3000/accounts/google/login
+// URIs 5 
+// http://localhost:3000/accounts/login
+// URIs 6 
+// http://localhost:3300/accounts/googleonetap
+// URIs 7 
+// http://localhost:3300/accounts/login
+// URIs 8 
+// http://localhost:3300/login
 
 export default function Signin() {
-    const [id, setid] = useState('')
-    const [ps, setps] = useState('')
-    function handleSubmit(e){
-        // e.preventDefault()
+    // const [id, setid] = useState('')
+    // const [ps, setps] = useState('')
+
+    function handleCredentialResponse(response) {
+        console.log(response);
     }
-    
+
+    useEffect(() => {
+        window.google.accounts.id.initialize({
+            client_id: clientID,
+            callback: handleCredentialResponse,
+            ux_mode:'redirect',
+            login_uri:"http://localhost:3300/accounts/login"
+        });
+        window.google.accounts.id.renderButton(
+            document.getElementById("buttonDiv"),
+            { theme: "outline", size: "large" }  
+            // customization attributes
+          );
+        // window.google.accounts.id.prompt()
+
+    })
 
     return (
         <div className="box">
-            <form className="loginform" action="/accounts/login" method="post" 
-            // target="_blank" 
-                onSubmit={handleSubmit}
-            >
-                <h2>
-                    Login
-                </h2>
-                <div>
-                    <label for="userId">Username</label> <br />
-                    <input
-                        type="text"
-                        id="userId"
-                        name="id"
-                        placeholder="Email"
-                        // required
-                        value={id}
-                        onChange={e=>setid(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label for="pass"> Password </label><br />
-                    <input type="text" id="pass" name="password" placeholder="Password"
-                    onChange={e=>setps(e.target.value)}
-                    //required 
-                    />
-                </div>
-                {/* <input type="checkbox" id="checkbox" name="checkAccount" />
-                <label for="checkbox">Remember me</label> */}
-                <br />
-                <button type="submit">LOG IN</button>
-            </form>
+            <div id="buttonDiv"></div>
         </div>
     )
 }
@@ -60,24 +72,3 @@ export default function Signin() {
 
 
 
-
-// useEffect(()=>{
-{/* <form>
-        <input type="email" placeholder="Email"></input>
-        <p></p>
-        <input type="password" placeholder="Password"></input>
-        <p></p>
-        <button type="submit">Log in</button>
-    </form> */}
-//   window.google.accounts.id.initialize({
-//     client_id:clientID,
-//     callback: data => {
-//       // console.log(jwt(data.credential));
-//       setSignin(true)
-//       setid(jwt(data.credential).email)
-//     }
-//   })
-//   window.google.accounts.id.prompt(notification=>{
-//     console.log("prompt notification: " + JSON.stringify(notification));
-//   })
-// })

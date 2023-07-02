@@ -2,11 +2,10 @@ import {
     // useState, 
     useEffect
 } from "react"
-import { json } from "react-router-dom";
+// import { json } from "react-router-dom";
 // import jwt from 'jwt-decode'
 const clientID = "1041261791254-mbtvjmn3kep32isbfr7mn6v2fp99ibu8.apps.googleusercontent.com"
-
-const code_receiver_uri = "http://localhost:3300/accounts/googleonetap"
+// const code_receiver_uri = "http://localhost:3300/accounts/googleonetap"
 
 // for google
 // Authorized redirect URIs
@@ -29,7 +28,6 @@ const code_receiver_uri = "http://localhost:3300/accounts/googleonetap"
 // http://localhost:3300/login
 
 export default function Signin() {
-
     function handleCredentialResponse(response) {
         console.log(response);
         const xhr = new XMLHttpRequest();

@@ -126,7 +126,7 @@ export default function App() {
 
       <Route path="/" element={
         <div className="box">
-          <Heading heading={HEADING} />
+          <Heading heading={HEADING} isSignedin={isSignedin}/>
           <Search SearchHandler={SearchHandler} />
 
           {isSignedin ? <div>{mailid}</div> : <div>Not signed in</div>}
@@ -139,6 +139,7 @@ export default function App() {
         </div>
       } />
 
+      
       <Route path="/signin" element={<Signin />} />
       {/* <Route path="/register" element={<Register />} /> */}
       <Route path="/cart" element={<Cart cartItems={cart} />} />

@@ -15,7 +15,8 @@ const clientID = "1041261791254-mbtvjmn3kep32isbfr7mn6v2fp99ibu8.apps.googleuser
 const clientSECRET = "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";
 const client = new OAuth2Client(clientID);
 const scopes = ['www.googleapis.com/auth/userinfo.email', 'www.googleapis.com/auth/userinfo.profile']
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const { log } = require('console');
 router.use(bodyParser.urlencoded({ extended: true }));
 const MongooseConnection = mongoose.createConnection("mongodb://127.0.0.1:27017/shop")
 
@@ -44,15 +45,10 @@ router.use(session({
 }))
 
 passport.serializeUser(function (user, cb) {
-    console.log('inside seriealize...user' + JSON.stringify(user));
-
-    console.log("user type: "+typeof user);
-
     cb(null, user.doc.id);
 });
 
 passport.deserializeUser(function (id, cb) {
-    console.log('inside deserialize...id: ' + id );
     User.findById(id).then((user) => {
         if (user) {
             return cb(null, user)
@@ -71,8 +67,6 @@ passport.use(
             verifyCsrfToken: false, // whether to validate the csrf token or not
         },
         function (profile, done) {
-            // console.log("profile received is: " + JSON.stringify(profile));
-            // console.log('name is: ' + JSON.stringify(profile.name));
             if (!profile) { return done(null) }
             User.findOrCreate({
                 email: (profile.emails[0].value),
@@ -88,66 +82,40 @@ passport.use(
 );
 
 passport.use('custom', new customStrategy(
-    (req, done)=>{
+    (req, done) => {
         const userDetails = (jwt.decode(req.body.credential))
 
         User.findOrCreate({
             email: userDetails.email,
-            Name: userDetails.give_name + " " + userDetails.family_name
+            Name: userDetails.given_name + " " + userDetails.family_name
         }).then((user) => {
-            console.log("user found:" + JSON.stringify(user));
             return done(err, user);
         }).catch((err) => {
             return done(err)
         });
-
-        // console.log("this is custom strategy speaking\n...\n"+userDetails.email + "\n" + userDetails.given_name + "\n" + userDetails.family_name);
-        // console.log(`);
-        return done(false);
     }
 ))
 
 router.post('/login', (req, res, next) => {
-    // console.log((req.body));
     passport.authenticate('google-one-tap', {
         failureRedirect: 'http://localhost:3000/signin',
         successRedirect: 'http://localhost:3000/'
     })(req, res, next)
 })
 
-router.post('/googleonetap', (req, res, next)=>{
-    
-    passport.authenticate('custom', (err, user, info)=>{
-            if(user){
-                req.logIn(user, (err)=>{
-                    if(err) {return next(err)}
-                    else{
-                        return res.send('/')
-                    }
-                })
-            }
-        // }
-    })(req, res, next)
+router.post('/googleonetap', (req, res, next) => {
 
-    // passport.authenticate('custom', {
-    //     // failureFlash:'fault'
-    //     // failureMessage:'fault'
-    //     // failureRedirect:'http://localhost:3000/',
-    //     // successRedirect:'h'
-    //     failWithError:true
-    // }), 
-    // (req, res, next)=>{
-    //     console.log('inside function after authenticate...req: ' + req.body);
-    //     // console.log('req1');
-    // },
-    // (err, req, res, next)=>{
-    //     console.log('err: ' + err + "\nreqbody: " + req.body);
-    // }
-    
-    // console.log(req);
-    // console.log(jwt.decode(req.body.credential));
-    // console.log("post request body:\n...\n" + req.body);
-    // res.send('/')
+    passport.authenticate('custom', (err, user, info) => {
+        if (user) {
+            req.logIn(user, (err) => {
+                if (err) { return next(err) }
+                if(!user){return res.send('/signin')}
+                else {
+                    return res.send('/')
+                }
+            })
+        }
+    })(req, res, next)
 })
 
 var loginState = {}
@@ -167,185 +135,21 @@ router.get('/querylogin', (req, res) => {
             email: ""
         })
     }
-    // console.log("user found is :\n" + req.user);
-
 })
 
-router.get('/signout', (req, res)=>{
-    req.logOut((err)=>{
-        if(err){
+router.get('/signout', (req, res) => {
+    req.logOut((err) => {
+        if (err) {
             console.log(err);
         }
-        else{
+        else {
             res.redirect('http://localhost:3000/')
         }
     })
 })
 
-// router.post('/login',
-//     (req, res, next) => {
-//         console.log(req.body);
-//         passport.authenticate('google-one-tap',
-//             {
-//                 failureRedirect: '/signin',
-//                 successRedirect: '/'
-//             })(req, res, next)
-//     },
-//     // (req, res) => {
-//     //     console.log(req.body);
-//     //     res.send('/')
-//     // }
-// )
-
 router.get('/secretpage', (req, res) => {
     res.redirect('http://localhost:3000/signin')
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// function verifyPassword(password, hash, salt) {
-//     //password is the password entered by the user
-//     //hash and salt are those stored with the user in the db
-//     //those will be used to hash the input password and the resulting hash will be checked against it
-//     var newHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
-//     return hash === newHash;
-// }
-
-// function generateHash(password) {
-//     var salt = crypto.randomBytes(32).toString('hex');
-//     var genHash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
-
-//     return {
-//         salt: salt,
-//         hash: genHash
-//     };
-// }
-
-
-
-
-
-// passport.use(new localStrategy({
-//     usernameField: 'username',
-//     passwordField: 'password',
-//     // passReqToCallback: true,
-//     session: true
-//   },(username, password, done) => {
-//     console.log(username);
-//     User.findOne({ email_id: username }).then((user) => {
-//         if (!user) {
-//             return done(null, false)
-//         }
-
-//         //user existence is confirmed, now check validity of password
-//         const isPasswordValid = verifyPassword(password, user.hash, user.salt)
-//         console.log("hash:" + user.hash + "salt:" + user.salt);
-//         console.log(isPasswordValid);
-//         if (isPasswordValid) {
-//             console.log("returning " + user);
-//             return (null, user);
-//         }
-//         else {
-//             return done(null, false)
-//         }
-//     }).catch((err) => {
-//         console.log(err);
-//         done(err)
-//     })
-// }))
-
-
-
-
-
-
-// router.post('/register', (req, res) => {
-
-//     const username = req.body.username
-//     const password = req.body.password
-//     const { salt, hash } = generateHash(password)
-
-//     User.exists({ email_id: username }).then((x) => {
-//         if (x) {
-//             res.send('user already exists')
-//         }
-//         else {
-//             User.create(new User({
-//                 email_id: username,
-//                 hash: hash,
-//                 salt: salt
-//             })).then((z) => {
-//                 res.send('new user saved\n' + z)
-//             }).catch((err) => { console.log(err); })
-//         }
-//     })
-
-// })
-
-// router.post('/login', (req, res)=>{
-//     res.send('on /login')
-// })
-
-// router.post('/login', (req, res, next) =>
-//     passport.authenticate('local',
-//         {
-//             successReturnToOrRedirect: '/',
-//             successRedirect: '/',
-//             successMessage: 'success',
-//             failureRedirect: '/signin'
-//         }
-//     )(req, res, next)
-//     //     // ,
-//     //     // (err, req, res, next)=>{
-//     //     //     res.send('success')
-//     //     // }
-//     //     // ,
-//     //     // (err, req, res, next)=>{}
-// )
-
-// router.post('/login', (req, res)=>{res.send('hello')})
-
-// router.post('/login', (req, res)=>{
-//     const user = new User({
-//         email_id:req.body.username
-
-//     })
-// })
-
-// router.get('/protected', (req, res) => {
-//     res.send("this message must only be shown after the user has been authenticated")
-// })
-
-// router.post('/login', (req, res) => {
-
-//     const email_id = req.body.username
-//     const password = req.body.password
-
-//     User.exists({ email_id: email_id }).then((x) => {
-//         if (x) {
-//             console.log('already exists');
-//         }
-//         else {
-//             User.findOrCreate({
-//                 email_id: email_id,
-//                 password: password
-//             })
-//         }
-//     })
-
-//     res.redirect('/signin')
-// })
 
 module.exports = router;

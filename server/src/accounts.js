@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router();
 const findOrCreate = require('mongoose-findorcreate')
 const mongoose = require('mongoose');
-const crypto = require('crypto')
 const passport = require('passport');
 const localStrategy = require('passport-local').Strategy
 const session = require('express-session')
@@ -16,7 +15,6 @@ const clientSECRET = "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";
 const client = new OAuth2Client(clientID);
 const scopes = ['www.googleapis.com/auth/userinfo.email', 'www.googleapis.com/auth/userinfo.profile']
 const bodyParser = require('body-parser');
-const { log } = require('console');
 router.use(bodyParser.urlencoded({ extended: true }));
 const MongooseConnection = mongoose.createConnection("mongodb://127.0.0.1:27017/shop")
 
@@ -40,7 +38,7 @@ router.use(session({
     saveUninitialized: true,
     store: sessionStore,
     cookie: {
-        maxAge: 10 * 60 * 1000,
+        maxAge: 24 * 60 * 60 * 1000,
     },
 }))
 
@@ -72,7 +70,6 @@ passport.use(
                 email: (profile.emails[0].value),
                 Name: profile.name.givenName + " " + profile.name.familyName
             }).then((user) => {
-                console.log("user found:" + JSON.stringify(user));
                 return done(err, user);
             }).catch((err) => {
                 return done(err)
@@ -109,7 +106,7 @@ router.post('/googleonetap', (req, res, next) => {
         if (user) {
             req.logIn(user, (err) => {
                 if (err) { return next(err) }
-                if(!user){return res.send('/signin')}
+                if (!user) { return res.send('/signin') }
                 else {
                     return res.send('/')
                 }
@@ -121,7 +118,6 @@ router.post('/googleonetap', (req, res, next) => {
 var loginState = {}
 
 router.get('/querylogin', (req, res) => {
-
 
     if (req.isAuthenticated()) {
         res.json({

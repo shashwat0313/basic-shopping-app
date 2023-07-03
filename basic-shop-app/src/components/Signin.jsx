@@ -1,5 +1,5 @@
 import {
-    // useState, 
+    useState,
     useEffect
 } from "react"
 // import { json } from "react-router-dom";
@@ -28,7 +28,48 @@ const clientID = "1041261791254-mbtvjmn3kep32isbfr7mn6v2fp99ibu8.apps.googleuser
 // http://localhost:3300/login
 
 export default function Signin({ isSignedIn }) {
-    
+
+    const [loaded, setLoadState] = useState(false)
+
+    useEffect(() => {
+        if(isSignedIn===true){
+            window.location.href = '/'
+        }
+        const googleScriptTag = document.createElement('script')
+        googleScriptTag.src = "https://accounts.google.com/gsi/client"
+        googleScriptTag.addEventListener('load', () => {
+            setLoadState(true)
+            console.log('google accounts script loaded');
+        })
+        document.body.appendChild(googleScriptTag)
+    }, [isSignedIn])
+
+    useEffect(() => {
+        if (!loaded) { return }
+        else {
+            //execute google.accounts.id here
+            if (!isSignedIn) {
+                window.google.accounts.id.initialize({
+                    client_id: clientID,
+                    callback: handleCredentialResponse,
+                    ux_mode: 'redirect',
+                    login_uri: "http://localhost:3300/accounts/login"
+                });
+                window.google.accounts.id.renderButton(
+                    document.getElementById("buttonDiv"),
+                    // customization attributes
+                    {
+                        theme: "filled_black",
+                        size: "large",
+                        text: "continue_with",
+                    }
+                );
+                window.google.accounts.id.prompt()
+            }
+        }
+    }, [isSignedIn, loaded])
+
+
     function handleCredentialResponse(response) {
         console.log(response);
         const xhr = new XMLHttpRequest();
@@ -41,29 +82,29 @@ export default function Signin({ isSignedIn }) {
         xhr.send('credential=' + response.credential);
     }
 
-    useEffect(() => {
-        if (!isSignedIn) {
-            window.google.accounts.id.initialize({
-                client_id: clientID,
-                callback: handleCredentialResponse,
-                ux_mode: 'redirect',
-                login_uri: "http://localhost:3300/accounts/login"
-            });
-            window.google.accounts.id.renderButton(
-                document.getElementById("buttonDiv"),
-                // customization attributes
-                {
-                    theme: "filled_black",
-                    size: "large",
-                    text: "continue_with",
-                }
-            );
-            window.google.accounts.id.prompt()
-        }
-        else{
-            window.location.href = '/'
-        }
-    })
+    // useEffect(() => {
+    //     if (!isSignedIn) {
+    //         window.google.accounts.id.initialize({
+    //             client_id: clientID,
+    //             callback: handleCredentialResponse,
+    //             ux_mode: 'redirect',
+    //             login_uri: "http://localhost:3300/accounts/login"
+    //         });
+    //         window.google.accounts.id.renderButton(
+    //             document.getElementById("buttonDiv"),
+    //             // customization attributes
+    //             {
+    //                 theme: "filled_black",
+    //                 size: "large",
+    //                 text: "continue_with",
+    //             }
+    //         );
+    //         window.google.accounts.id.prompt()
+    //     }
+    //     else {
+    //         window.location.href = '/'
+    //     }
+    // }, [!isSignedIn])
 
     return (
         <div className="box">

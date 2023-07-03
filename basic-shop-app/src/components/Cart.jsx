@@ -9,7 +9,7 @@ const cartEndpoint = '/api/cart'
 
 export default function Cart({ cartItems, isSignedIn, emailid, updateCart }) {
 
-  // const [cartpage, setCart] = useState([])
+  // const [cartpage, setCart] = useState([cartItems])
   // const [signinstate, setsigninstate] = useState(false)
   // const [id, setid] = useState('')
 
@@ -28,29 +28,49 @@ export default function Cart({ cartItems, isSignedIn, emailid, updateCart }) {
   //   }
   // }
 
-  useEffect(() => {
-    // fetch("/accounts/querylogin").then(
-    //   (res) => {
-    //     // console.log('res from querylogin: ' + res);
-    //     res.json().then(
-    //       (result => {
-    //         console.log('result of querylogin :' + JSON.stringify(result));
-    //         setsigninstate(result.isLoggedIn)
-    //         if (result.isLoggedIn) {
-    //           setid(result.email)
-    //         }
-    //       })
-    //     )
-    //   }
-    // )
-    updateCart()
+  useEffect(()=>{
+    // setCart(cartItems)
+    if(isSignedIn){
+      updateCart()
+    }
+    else{
+      console.log('cart:not logged in');
+      window.location.href = '/signin'
+    }
+  }, [])
+
+  // useEffect(() => {
+  //   updateCart()
+  //   setInterval(() => {
+  //     fetch("/accounts/querylogin").then(
+  //       (res) => {
+  //         // console.log('res from querylogin: ' + res);
+  //         res.json().then(
+  //           (result => {
+  //             console.log('result of querylogin :' + JSON.stringify(result));
+  //             console.log(result.isLoggedIn);
+  //             console.log();
+  //             if (result.isLoggedIn===true) {
+  //               setsigninstate(true)
+  //               // console.log('setting id' + result.);
+  //               console.log('signinstate:' + signinstate);
+  //               // setid(result.email)
+  //             }
+  //           })
+  //         )
+  //       }
+  //     )
+  //     getCartItemsByEmailid()
+  //     updateCart()
+  //     console.log('hello');
+  //   }, 3000);
     // getCartItemsByEmailid()
 
-  }, [])
+  // }, [])
 
   return (
     <div className="box">
-      <h1>Cart page</h1>
+      <h1>Your Cart</h1>
 
       <ol>
         {cartItems.map((x, idx) =>

@@ -6,17 +6,17 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import AccountDetails from './components/AccountDetails';
 
 const router = createBrowserRouter([
   {
     path: "/*",
     element: <App /> ,
+  },
+  {
+    path:'/account',
+    element:<AccountDetails/>
   }
-  // ,
-  // {
-  //   path: "/cart",
-  //   Component:Cart 
-  // }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

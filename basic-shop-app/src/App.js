@@ -12,6 +12,7 @@ import {
   // useFetcher,
 } from "react-router-dom";
 import Signin from "./components/Signin";
+import AccountDetails from "./components/AccountDetails";
 // import jwt from 'jwt-decode'
 // import Register from "./components/Register";
 // import { useCookies } from 'react-cookie';
@@ -19,7 +20,7 @@ import Signin from "./components/Signin";
 let HEADING = "";
 let ITEMS = []
 // const clientID = "1041261791254-mbtvjmn3kep32isbfr7mn6v2fp99ibu8.apps.googleusercontent.com"
-const addToCartReceiverURI = "/api/addtocart"
+const addToCartReceiverURI = "/api/updatecart"
 const cartEndpoint = '/api/cart'
 
 export default function App() {
@@ -31,13 +32,25 @@ export default function App() {
   const [isSignedin, setSignin] = useState(false);
   const [mailid, setid] = useState("")
 
+  // function handleCredentialResponse(response) {
+  //   console.log(response);
+  //   const xhr = new XMLHttpRequest();
+  //   xhr.open('POST', "/accounts/googleonetap", true);
+  //   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  //   xhr.setRequestHeader('X-Requested-With', 'XmlHttpRequest')
+  //   xhr.onload = function () {
+  //     window.location.href = xhr.responseText
+  //   };
+  //   xhr.send('credential=' + response.credential);
+  // }
+
   useEffect(() => {
     fetch("/api/assets").then(
       (res) => {
-        console.log(res);
+        // console.log(res);
         res.json().then(
           (result) => {
-            console.log(result);
+            // console.log(result);
             setList((prev) => {
               HEADING = result.HEADING;
               ITEMS = result.ITEMS;
@@ -63,29 +76,32 @@ export default function App() {
       }
     )
 
-    getCartItemsByEmailid()
-
-    // if (!isSignedin) {
-    //   console.log('not supposed to show the prompt');
-    //   window.google.accounts.id.initialize({
-    //     client_id: clientID,
-    //     callback: handleCredentialResponse
-    //   });
-    //   window.google.accounts.id.prompt()
-    // }    
-
   }, [])
 
-  function updateUserCart(requestBody) {
-
+  useEffect(() => {
     if (isSignedin) {
-      console.log('update user cart called');
+      const xhr = new XMLHttpRequest()
+      xhr.open("POST", cartEndpoint, true)
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+      xhr.setRequestHeader('X-Requested-With', 'XmlHttpRequest')
+      xhr.onload = () => {
+        // console.log("received xhr response from /api/cart: " + JSON.parse(xhr.responseText));
+        setCart(JSON.parse(xhr.responseText))
+      }
+      xhr.send("email=" + mailid)
+    }
+  }, [isSignedin, mailid])
+
+
+  function updateUserCart(requestBody) {
+    if (isSignedin) {
+      // console.log('update user cart called');
       const xhr = new XMLHttpRequest()
       xhr.open("POST", addToCartReceiverURI, true)
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
       xhr.setRequestHeader('X-Requested-With', 'XmlHttpRequest')
       xhr.onload = () => {
-        console.log("received xhr response from /api/cart: " + xhr.responseText);
+        // console.log("received xhr response from /api/cart: " + xhr.responseText);
         setCart(JSON.parse(xhr.responseText))
       }
       xhr.send("CartInfo=" + JSON.stringify(requestBody))
@@ -95,13 +111,24 @@ export default function App() {
     }
   }
 
+  function deleteFromCart(e) {
+    const name = e.target.value;
+    setCart((prev) => {
+      const itemIdx = prev.findIndex((x) => x.name === name)
+      const newCart = prev.slice(0, itemIdx).concat(prev.slice(itemIdx + 1))
+      updateUserCart({ email: mailid, cart: newCart })
+      return newCart
+    })
+    window.location.href = '/cart'
+  }
+
   function addToCart(e) {
     const name = e.target.value;
     setCart((prev) => {
       const newCart = [...prev, ITEMS[ITEMS.findIndex((x) => x.name === name)]];
       const requestBody = { email: mailid, cart: newCart }
       updateUserCart(requestBody)
-      console.log(requestBody);
+      // console.log(requestBody);
       return newCart
     })
   }
@@ -155,24 +182,36 @@ export default function App() {
     setQtySortedState("Qty-unsorted")
   }
 
-  function getCartItemsByEmailid() {
-    console.log("emailid:" + mailid);
-    if (isSignedin) {
-      const xhr = new XMLHttpRequest()
-      xhr.open("POST", cartEndpoint, true)
-      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
-      xhr.setRequestHeader('X-Requested-With', 'XmlHttpRequest')
-      xhr.onload = () => {
-        console.log("received chr response from /api/cart: " + JSON.parse(xhr.responseText));
-        setCart(JSON.parse(xhr.responseText))
-      }
-      xhr.send("email=" + mailid)
-    }
-  }
+  // function getCartItemsByEmailid() {
+  //   console.log("emailid:" + mailid);
+  //   if (isSignedin) {
+  //     const xhr = new XMLHttpRequest()
+  //     xhr.open("POST", cartEndpoint, true)
+  //     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded")
+  //     xhr.setRequestHeader('X-Requested-With', 'XmlHttpRequest')
+  //     xhr.onload = () => {
+  //       console.log("received xhr response from /api/cart: " + JSON.parse(xhr.responseText));
+  //       setCart(JSON.parse(xhr.responseText))
+  //     }
+  //     xhr.send("email=" + mailid)
+  //   }
+  // }
 
-  useEffect(() => {
-    getCartItemsByEmailid()
-  }, [])
+  //ToDo -> one tap prompt must only show when user is not signed in
+
+  // useEffect(() => {
+  //   console.log(isSignedin);
+  //   setTimeout(() => {
+  //     if (isSignedin === false || isSignedin===null) {
+  //       console.log('issisgnedin=' + isSignedin !== true);
+  //       window.google.accounts.id.initialize({
+  //         client_id: clientID,
+  //         callback: handleCredentialResponse
+  //       });
+  //       window.google.accounts.id.prompt()
+  //     }
+  //   }, 2000);
+  // }, [isSignedin, mailid])
 
   return (
     <Routes>
@@ -192,9 +231,8 @@ export default function App() {
         </div>
       } />
 
-
       <Route path="/signin" element={<Signin isSignedIn={isSignedin} />} />
-      <Route path="/cart" element={<Cart updateCart={getCartItemsByEmailid} cartItems={cart} isSignedIn={isSignedin} emailid={mailid} />} />
+      <Route path="/cart" element={<Cart removeFromCart={deleteFromCart} />} />
     </Routes>
   );
 }

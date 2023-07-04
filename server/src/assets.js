@@ -69,17 +69,7 @@ router.post('/cart', (req, res) => {
     console.log('received xhr req');
 })
 
-router.post('/addtocart', (req, res) => {
-    // const cart = (req.body.info).cart
-    // console.log(cart);
-    // const email = JSON.parse(req.body.info).email
-    // console.log(cart + "..." + email);
-    const cartString = JSON.stringify(JSON.parse(req.body.CartInfo).cart)
-    // console.log("\ncartstring is: "+JSON.parse(cartString))
-    // console.log("\ncartstring is: "+JSON.stringify((JSON.parse(cartString))[0]))
-
-    //todo: create an array with cart items
-
+router.post('/updatecart', (req, res) => {
     const email = JSON.parse(req.body.CartInfo).email
     const cartArr = JSON.parse(JSON.stringify(JSON.parse(req.body.CartInfo).cart))
 

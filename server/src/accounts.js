@@ -39,6 +39,7 @@ router.use(session({
     store: sessionStore,
     cookie: {
         maxAge: 24 * 60 * 60 * 1000,
+        // httpOnly:false
     },
 }))
 
@@ -115,8 +116,6 @@ router.post('/googleonetap', (req, res, next) => {
     })(req, res, next)
 })
 
-var loginState = {}
-
 router.get('/querylogin', (req, res) => {
 
     if (req.isAuthenticated()) {
@@ -142,10 +141,6 @@ router.get('/signout', (req, res) => {
             res.redirect('http://localhost:3000/')
         }
     })
-})
-
-router.get('/secretpage', (req, res) => {
-    res.redirect('http://localhost:3000/signin')
 })
 
 module.exports = router;
